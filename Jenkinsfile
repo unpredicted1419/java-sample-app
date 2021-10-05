@@ -6,26 +6,26 @@ pipeline {
         UAT = "ACC"
     }
     stages {
-        stage ("Checkout"){
-           // agent "label_node"
-            steps{
-                script {
+        // stage ("Checkout"){
+        //    // agent "label_node"
+        //     steps{
+        //         script {
                    
-                   sh """
-                        rm -rf java-sample-app
-                        git clone https://github.com/crazy4devops/java-sample-app.git
-                        cd java-sample-app
-                        git checkout dev
-                        ls -lrt
-                   """
-                }
-            }
-        }
+        //            sh """
+        //                 rm -rf java-sample-app
+        //                 git clone https://github.com/crazy4devops/java-sample-app.git
+        //                 cd java-sample-app
+        //                 git checkout dev
+        //                 ls -lrt
+        //            """
+        //         }
+        //     }
+        // }
         stage ("Build Source Code"){
             steps {
                 script{
                     sh """
-                        cd  java-sample-app
+                        
                         mvn clean install
                     """
                 }
@@ -34,7 +34,7 @@ pipeline {
         stage ("Code Analysis"){
             steps {
                 script {
-                    sh "cd java-sample-app;/opt/sonar/bin/sonar-scanner"
+                    sh "/opt/sonar/bin/sonar-scanner"
                 }
             }
         }
