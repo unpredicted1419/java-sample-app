@@ -1,46 +1,72 @@
 pipeline {
-  agent any
-  stages {     
-    stage("BuildCode") {
-            steps {
-                sh 'mvn clean install'
-                stash includes: '**/target/*.jar', name: 'app'
-            }
+    agent any
+    environment {
+        PRD = "PROD"
+        DEV = "DEV"
+        UAT = "ACC"
     }
-    stage('Unit-Test') {
-            steps {
-                sh 'mvn test'
-            }
-    }
-    stage ('DeploymentStgs'){
-            parallel {
-                stage ('Deploy To DEV') {
-                    steps {
-                                
-                                // unstash 'getJars'
-                                // sh 'ls -lrt'
-                                sh 'mkdir -p ./dummy'
-                                unstash 'app'
-                                sh 'ls -lrt'
-                                sh 'echo "Deploy into Prod"'
-
-                    }
-                }
-                
-                stage ('Deploy To UAT') {
-                    steps {
-                                sh 'echo "Deploy into Prod"'
-
-                    }
-                }    
-                stage ('Deploy To Prod') {
-                    steps {
-                                sh 'echo "Deploy into Prod"'
-
-                    }
+    stages {
+        stage ("Checkout"){
+           // agent "label_node"
+            steps{
+                script {
+                   
+                   sh """
+                        rm -rf java-sample-app
+                        git clone https://github.com/crazy4devops/java-sample-app.git
+                        cd java-sample-app
+                        git checkout dev
+                        ls -lrt
+                   """
                 }
             }
+        }
+        stage ("Build Source Code"){
+            steps {
+                script{
+                    sh """
+                        cd  java-sample-app
+                        mvn clean install
+                    """
+                }
+            }
+        }
+        stage ("Code Analysis"){
+            steps {
+                script {
+                    sh "cd java-sample-app;/opt/sonar/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage ("Run Unit Test"){
+            steps {
+                echo "Running Unit Test Cases"
+                // script {
+                //     sh "mvn test"
+
+                // }
+            }
+        }
+        stage ("Deploy Dev"){
+            steps {
+                echo "Deploying.....Dev"
+            }
+        }
+        stage ("Deploy UAT"){
+            steps {
+                echo "Deploying.....UAT"
+            }
+        }
+
+        stage ("Deploy PRD"){
+            input{
+                message "Do you want to proceed for production deployment?"
+            }
+            steps {
+                echo "Deploying.....PRD"
+            }
+        }
+
     }
-               
-}
 }
