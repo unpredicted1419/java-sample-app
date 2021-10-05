@@ -6,26 +6,11 @@ pipeline {
         UAT = "ACC"
     }
     stages {
-        // stage ("Checkout"){
-        //    // agent "label_node"
-        //     steps{
-        //         script {
-                   
-        //            sh """
-        //                 rm -rf java-sample-app
-        //                 git clone https://github.com/crazy4devops/java-sample-app.git
-        //                 cd java-sample-app
-        //                 git checkout dev
-        //                 ls -lrt
-        //            """
-        //         }
-        //     }
-        // }
+        
         stage ("Build Source Code"){
             steps {
                 script{
                     sh """
-                        
                         mvn clean install
                     """
                 }
@@ -42,20 +27,16 @@ pipeline {
         stage ("Run Unit Test"){
             steps {
                 echo "Running Unit Test Cases"
-                // script {
-                //     sh "mvn test"
-
-                // }
             }
         }
         stage ("Deploy Dev"){
             steps {
-                echo "Deploying.....Dev"
+                echo "Deploying.....${DEV}"
             }
         }
         stage ("Deploy UAT"){
             steps {
-                echo "Deploying.....UAT"
+                echo "Deploying.....${UAT}"
             }
         }
 
@@ -64,7 +45,7 @@ pipeline {
                 message "Do you want to proceed for production deployment?"
             }
             steps {
-                echo "Deploying.....PRD"
+                echo "Deploying.....${PRD}"
             }
         }
 
