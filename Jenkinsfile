@@ -1,46 +1,30 @@
-pipeline {
-  agent any
-  stages {     
-    stage("BuildCode") {
-            steps {
-                sh 'mvn clean install'
-                stash includes: '**/target/*.jar', name: 'app'
+pipeline{
+    agent any
+    stages{
+        stage("CheckoutStage"){
+            steps{
+               checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'crazy4devops-jenkins-github-token', url: 'https://github.com/crazy4devops/java-sample-app.git']]])
             }
-    }
-    stage('Unit-Test') {
-            steps {
-                sh 'mvn test'
+        }
+        stage("Build Source Code"){
+            steps{
+                echo "Building Source Code"
+                sh "mvn install"
             }
-    }
-    stage ('DeploymentStgs'){
-            parallel {
-                stage ('Deploy To DEV') {
-                    steps {
-                                
-                                // unstash 'getJars'
-                                // sh 'ls -lrt'
-                                sh 'mkdir -p ./dummy'
-                                unstash 'app'
-                                sh 'ls -lrt'
-                                sh 'echo "Deploy into Prod"'
+        }
 
-                    }
-                }
-                
-                stage ('Deploy To UAT') {
-                    steps {
-                                sh 'echo "Deploy into Prod"'
-
-                    }
-                }    
-                stage ('Deploy To Prod') {
-                    steps {
-                                sh 'echo "Deploy into Prod"'
-
-                    }
-                }
+        stage("Run UNIT-Tests"){
+            steps{
+                echo "Runnning Unit Tests"
+                sh "mvn test"
             }
+        }
+
+        stage("Static Code Analysis"){
+            steps{
+                echo "Runnning Code Analysis"
+            
+            }
+        }
     }
-               
-}
 }
